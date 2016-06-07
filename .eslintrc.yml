@@ -1,0 +1,42 @@
+env:
+  browser: true
+  es6: true
+  node: true
+extends:
+  - eslint:recommended
+  - plugin:react/recommended
+parser: babel-eslint
+parserOptions:
+  ecmaFeatures:
+    experimentalObjectRestSpread: true
+    jsx: true
+  sourceType: module
+plugins:
+  - react
+rules:
+  indent:
+    - error
+    - 4
+  linebreak-style:
+    - error
+    - unix
+  quotes:
+    - error
+    - double
+  semi:
+    - error
+    - always
+  no-console:
+    - off
+  no-var:
+    - error
+  prefer-const:
+    - error
+  prefer-template:
+    - error
+  react/no-danger:
+    - off
+  react/prop-types:
+    - off
+  react/display-name:
+    - off

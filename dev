@@ -1,0 +1,11 @@
+#!/bin/bash
+
+export NODE_ENV=development
+export DATABASE=mongodb://localhost/default
+export ERASE_DATABASE=true
+export INIT_DATABASE=true
+export INIT_DATABASE_FROM="./demo"
+export ADMIN_SESSION=true
+export MAIL_TRANSPORT=console
+
+npm run watch
