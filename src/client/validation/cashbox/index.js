@@ -17,13 +17,14 @@
 "use strict";
 
 import {array, object, integer, date, string, validator, optional} from "@validation";
+import cashValues from "./cashValues";
 import recompute from "./recompute";
 
-const coinsOrBanknotes = array(object({
-    unitValue: integer,
-    number: integer,
-    total: integer
-}));
+const banknotesOrCoins = (type) => {
+    const res = {};
+    cashValues[type].forEach(unitValue => res[`${unitValue}`] = optional(integer));
+    return object(res);
+};
 
 const checks = array(object({
     checkBank: optional(string),
@@ -38,8 +39,8 @@ const total = object({
 });
 
 export default validator([object({
-    coins: coinsOrBanknotes,
-    banknotes: coinsOrBanknotes,
+    coins: banknotesOrCoins("coins"),
+    banknotes: banknotesOrCoins("banknotes"),
     checks: checks,
     total: object({
         coins: total,

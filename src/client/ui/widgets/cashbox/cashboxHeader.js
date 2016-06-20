@@ -49,6 +49,9 @@ export default (props) => <div>
                             { formatAmount(props.total.get("total")) }
                         </td>
                     </tr>
+                    <tr>
+                        <td colSpan="2">{props.children}</td>
+                    </tr>
                 </tbody>
             </table>
         </div>

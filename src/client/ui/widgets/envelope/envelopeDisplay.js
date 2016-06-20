@@ -17,9 +17,8 @@
 "use strict";
 
 import React from "react";
-import formatAmount from "../../formatting/amount";
 import {formatDate, formatDayOfWeek} from "../../formatting/date";
-import CashboxDisplay from "@widgets/cashbox/cashboxDisplay";
+import DetailedAmountDisplay from "../detailedAmount/detailedAmountDisplay";
 
 const boldStyle = {
     fontWeight: "bold"
@@ -29,14 +28,13 @@ const normalStyle = {};
 
 export default function ({value}) {
     const countedAmount = value.get("countedAmount");
-    const countedAmountDetails = value.get("countedAmountDetails");
 
     const tableLines = [];
 
     const addLine = function(title, firstPart, amount) {
         tableLines.push(<tr key={tableLines.length}>
             <td style={title ? boldStyle : normalStyle}>{firstPart}</td>
-            <td style={title ? boldStyle : normalStyle} className="text-right">{formatAmount(amount)}</td>
+            <td style={title ? boldStyle : normalStyle} className="text-right"><DetailedAmountDisplay value={amount}/></td>
         </tr>);
     };
 
@@ -48,7 +46,7 @@ export default function ({value}) {
     });
     addLine(true, <span><span className="glyphicon glyphicon-chevron-right"/> Montant réel</span>, countedAmount);
     addLine(true, <span><span className="glyphicon glyphicon-chevron-right"/> Somme</span>, value.get("sumAmount"));
-    addLine(false, <span><span className="glyphicon glyphicon-chevron-right"/> Différence {value.get("difference") == 0 ? <span className="glyphicon glyphicon-ok-sign"/> : null}</span>, value.get("difference"));
+    addLine(false, <span><span className="glyphicon glyphicon-chevron-right"/> Différence {value.getIn(["difference","amount"]) == 0 ? <span className="glyphicon glyphicon-ok-sign"/> : null}</span>, value.get("difference"));
     return <div>
         <div className="panel panel-default">
             <div className="panel-heading"><h4 className="panel-title">Comptes</h4></div>
@@ -61,15 +59,5 @@ export default function ({value}) {
                 <div className="panel-footer">{value.get("comments")}</div>
             : null }
         </div>
-
-        { countedAmountDetails ?
-            <div className="panel panel-default">
-                <div className="panel-heading"><h4 className="panel-title">Détails du montant réel: {formatAmount(countedAmountDetails.getIn(["total","total","total"]))}</h4></div>
-                <div className="panel-body">
-                    <CashboxDisplay value={countedAmountDetails}/>
-                </div>
-            </div>
-        : null }
-
     </div>;
 }

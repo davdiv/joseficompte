@@ -17,17 +17,8 @@
 "use strict";
 
 import React from "react";
-import formatAmount from "../../formatting/amount";
 import {formatDate, formatDayOfWeek} from "../../formatting/date";
-import CashboxDisplay from "@widgets/cashbox/cashboxDisplay";
-
-const AmountDetails = ({title, cashbox}) => cashbox ?
-    <div className="panel panel-default">
-        <div className="panel-heading"><h4 className="panel-title">{title} {formatAmount(cashbox.getIn(["total","total","total"]))}</h4></div>
-        <div className="panel-body">
-            <CashboxDisplay value={cashbox}/>
-        </div>
-    </div> : null;
+import DetailedAmountDisplay from "../detailedAmount/detailedAmountDisplay";
 
 export default function ({value}) {
     const date = value.get("date");
@@ -40,12 +31,12 @@ export default function ({value}) {
                 <tbody>
                     <tr><td>Date</td><td className="text-right">{formatDayOfWeek(date)} {formatDate(date)}</td></tr>
                     <tr><td>Référence</td><td className="text-right">{value.get("reference")}</td></tr>
-                    <tr><td>{ depositLabel }</td><td className="text-right">{formatAmount(value.getIn(["deposit", "amount"]))}</td></tr>
+                    <tr><td>{ depositLabel }</td><td className="text-right"><DetailedAmountDisplay value={value.getIn(["deposit"])} /></td></tr>
                     { refusal ?
-                        <tr><td>Montant refusé ({refusal.get("reason") || "raison non indiquée"})</td><td className="text-right">{formatAmount(refusal.get("amount"))}</td></tr>
+                        <tr><td>Montant refusé ({refusal.get("reason") || "raison non indiquée"})</td><td className="text-right"><DetailedAmountDisplay value={refusal.get("amount")}/></td></tr>
                     : null}
                     { refusal ?
-                        <tr><td>Total</td><td className="text-right">{formatAmount(value.get("total"))}</td></tr>
+                        <tr><td>Total</td><td className="text-right"><DetailedAmountDisplay value={value.get("total")}/></td></tr>
                     : null}
                 </tbody>
                 { value.get("comments") ?
@@ -53,7 +44,5 @@ export default function ({value}) {
                 : null }
             </table>
         </div>
-        <AmountDetails title={depositLabel} cashbox={value.getIn(["deposit", "amountDetails"])}/>
-        <AmountDetails title="Montant refusé" cashbox={value.getIn(["refusal", "amountDetails"])}/>
     </div>;
 }

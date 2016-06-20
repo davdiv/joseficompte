@@ -16,26 +16,25 @@
  */
 "use strict";
 
-import {validator, object, string, array, date, integer, id, optional} from "@validation";
-import cashbox from "@validation/cashbox";
+import {validator, object, string, array, date, id, optional} from "@validation";
+import detailedAmount from "@validation/detailedAmount";
 import recompute from "./recompute";
 
 export default validator([object({
     days : array(object({
         date : date,
-        sumAmount : integer,
+        sumAmount : detailedAmount,
         team : optional(string),
         lines : array(object({
             //label: id,
             details : optional(string),
             tags: array(id),
-            amount : integer
+            amount : detailedAmount
         }))
     })),
-    sumAmount : integer,
-    difference : integer,
-    countedAmount: integer,
-    countedAmountDetails : optional(cashbox),
+    sumAmount : detailedAmount,
+    difference : detailedAmount,
+    countedAmount: detailedAmount,
     tags : array(id),
     comments : optional(string)
 }), recompute]);

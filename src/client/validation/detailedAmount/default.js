@@ -16,18 +16,9 @@
  */
 "use strict";
 
-import setValue from "../setValue";
-import navigate from "../navigate";
+import Immutable from "immutable";
 
-import deleteValue from "@validation/deleteValue";
-
-export default ({editionHref, lastRevisionHref}) => async (dispatch, getState) => {
-    if (getState().getIn(["unsavedData", editionHref])) {
-        const confirmation = confirm(`Etes-vous sûr(e) de vouloir annuler vos modifications dans ${editionHref} ?`);
-        if (!confirmation) {
-            return;
-        }
-    }
-    dispatch(setValue(["unsavedData", editionHref], deleteValue));
-    dispatch(navigate(lastRevisionHref || "/"));
-};
+export default Immutable.Map({
+    "amount": 0,
+    "details": null
+});

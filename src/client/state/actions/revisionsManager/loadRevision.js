@@ -18,7 +18,7 @@
 
 import Immutable from "immutable";
 import setValue from "../setValue";
-import deleteValue from "../../deleteValue";
+import deleteValue from "@validation/deleteValue";
 
 export default ({ docTypePath, documentId, revisionId = "latest", refresh }) => async (dispatch, getState) => {
     const cachePath = ["cache", docTypePath, documentId, revisionId];

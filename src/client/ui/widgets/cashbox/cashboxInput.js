@@ -19,7 +19,9 @@
 import React from "react";
 import Immutable from "immutable";
 import ValueLink from "@validation/valueLink";
+import defaultCashbox from "@validation/cashbox/default";
 import recomputeCashbox from "@validation/cashbox/recompute";
+import cashValues from "@validation/cashbox/cashValues";
 import ShowValidation from "../showValidation";
 import CashCountInput from "./cashCountInput";
 import DateInput from "../dateInput";
@@ -28,10 +30,12 @@ import CashboxHeader from "./cashboxHeader";
 import TextInput from "../textInput";
 
 function ItemsTable(props) {
-    const itemsArrayLink = props.itemsArrayLink;
+    const {itemsArrayLink, type} = props;
     return <div>
-        <CashboxHeader title={ props.title } image={ props.image } total={ props.total } />
-        { itemsArrayLink.value.map((item, index) => <CashCountInput key={index} valueLink={itemsArrayLink.bind([index, "number"])} unitValue={itemsArrayLink.getIn([index, "unitValue"])} />) }
+        <CashboxHeader title={ props.title } image={ type } total={ props.total }>
+            <button className="btn btn-default btn-xs" onClick={() => itemsArrayLink.setIn([], defaultCashbox.get(type))}>Mettre à zéro</button>
+        </CashboxHeader>
+        { cashValues[type].map(unitValue => <CashCountInput key={unitValue} valueLink={itemsArrayLink.bind([`${unitValue}`], 0)} unitValue={unitValue} />) }
     </div>;
 }
 
@@ -82,13 +86,13 @@ function ChecksTable(props) {
 }
 
 export default (props) => {
-    const valueLink = ValueLink.wrapValidator(props.valueLink, recomputeCashbox);
+    const valueLink = ValueLink.wrapValidator(props.valueLink, recomputeCashbox, defaultCashbox);
     return <div className="row">
         <div className="col-md-4">
-            <ItemsTable title="Billets" image="banknotes" total={ valueLink.getIn(["total", "banknotes"]) } itemsArrayLink={ valueLink.bind(["banknotes"]) } />
+            <ItemsTable title="Billets" type="banknotes" total={ valueLink.getIn(["total", "banknotes"]) } itemsArrayLink={ valueLink.bind(["banknotes"]) } />
         </div>
         <div className="col-md-4">
-            <ItemsTable title="Pièces" image="coins" total={ valueLink.getIn(["total", "coins"]) } itemsArrayLink={ valueLink.bind(["coins"]) } />
+            <ItemsTable title="Pièces" type="coins" total={ valueLink.getIn(["total", "coins"]) } itemsArrayLink={ valueLink.bind(["coins"]) } />
         </div>
         <div className="col-md-4">
             <ChecksTable title="Chèques" image="checks" total={ valueLink.getIn(["total", "checks"]) } itemsArrayLink={ valueLink.bind(["checks"]) } />

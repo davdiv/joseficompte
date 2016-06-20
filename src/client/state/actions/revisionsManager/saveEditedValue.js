@@ -19,7 +19,7 @@
 import Immutable from "immutable";
 import setValue from "../setValue";
 import navigate from "../navigate";
-import deleteValue from "../../deleteValue";
+import deleteValue from "@validation/deleteValue";
 
 export default ({ editionHref, docTypePath, documentId }) => async (dispatch, getState) => {
     const storeState = getState();

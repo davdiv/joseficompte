@@ -16,18 +16,29 @@
  */
 "use strict";
 
+const recomputeTotalCoinsOrBanknotes = function(data, property) {
+    let totalNumber = 0;
+    let totalTotal = 0;
+    data.get(property).forEach((value, key) => {
+        if (value === 0) {
+            data = data.deleteIn([property, key]);
+        } else {
+            totalNumber += value;
+            totalTotal += value * key;
+        }
+    });
+    data = data.setIn(["total", property, "number"], totalNumber);
+    data = data.setIn(["total", property, "total"], totalTotal);
+    return data;
+};
+
 const recomputeTotal = function(data, property) {
     let totalNumber = 0;
     let totalTotal = 0;
     data.get(property).forEach(function(curObject, key) {
         if (key !== "total") {
-            const unitValue = curObject.get("unitValue");
             const number = curObject.get("number");
             if (typeof number == "number") {
-                if (typeof unitValue == "number") {
-                    curObject = curObject.set("total", number * unitValue);
-                    data = data.setIn([property, key], curObject);
-                }
                 totalNumber += number;
             } else {
                 // this is for checks
@@ -42,8 +53,9 @@ const recomputeTotal = function(data, property) {
 };
 
 export default function (data) {
-    data = recomputeTotal(data, "coins");
-    data = recomputeTotal(data, "banknotes");
+    data = recomputeTotalCoinsOrBanknotes(data, "coins");
+    data = recomputeTotalCoinsOrBanknotes(data, "banknotes");
     data = recomputeTotal(data, "checks");
-    return recomputeTotal(data, "total");
+    data = recomputeTotal(data, "total");
+    return data;
 }

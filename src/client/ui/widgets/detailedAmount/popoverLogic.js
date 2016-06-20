@@ -16,18 +16,32 @@
  */
 "use strict";
 
-import setValue from "../setValue";
-import navigate from "../navigate";
+import React from "react";
 
-import deleteValue from "@validation/deleteValue";
-
-export default ({editionHref, lastRevisionHref}) => async (dispatch, getState) => {
-    if (getState().getIn(["unsavedData", editionHref])) {
-        const confirmation = confirm(`Etes-vous sûr(e) de vouloir annuler vos modifications dans ${editionHref} ?`);
-        if (!confirmation) {
-            return;
-        }
+export default class extends React.Component {
+    constructor() {
+        super();
+        this.state = {
+            popover: null
+        };
     }
-    dispatch(setValue(["unsavedData", editionHref], deleteValue));
-    dispatch(navigate(lastRevisionHref || "/"));
-};
+
+    computePopoverStyle() {
+        const rect = this.domElt.getBoundingClientRect();
+        return {
+            display:"block",
+            left: "30px",
+            top: `${rect.top + rect.height + window.scrollY + 5}px`,
+            right: "30px",
+            minWidth: "340px",
+            maxWidth: "none",
+            marginBottom: "30px"
+        };
+    }
+
+    togglePopover() {
+        this.setState({
+            popover: this.state.popover ? null : this.computePopoverStyle()
+        });
+    }
+}

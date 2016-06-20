@@ -16,18 +16,10 @@
  */
 "use strict";
 
-import setValue from "../setValue";
-import navigate from "../navigate";
+import defaultCashbox from "./default";
+import recompute from "./recompute";
 
-import deleteValue from "@validation/deleteValue";
-
-export default ({editionHref, lastRevisionHref}) => async (dispatch, getState) => {
-    if (getState().getIn(["unsavedData", editionHref])) {
-        const confirmation = confirm(`Etes-vous sûr(e) de vouloir annuler vos modifications dans ${editionHref} ?`);
-        if (!confirmation) {
-            return;
-        }
-    }
-    dispatch(setValue(["unsavedData", editionHref], deleteValue));
-    dispatch(navigate(lastRevisionHref || "/"));
+export default (amount) => {
+    amount = Number(amount) || 0;
+    return amount === 0 ? defaultCashbox : recompute(defaultCashbox.setIn(["coins", "1"], amount));
 };

@@ -17,28 +17,27 @@
 "use strict";
 
 import Immutable from "immutable";
-import defaultCashbox from "@validation/cashbox/default";
+import defaultDetailedAmount from "@validation/detailedAmount/default";
 
 export const line = Immutable.fromJS({
     //label: null,
     details: null,
     tags: [],
-    amount: 0
+    amount: defaultDetailedAmount
 });
 
 export const day = Immutable.fromJS({
     date: null,
-    sumAmount: 0,
+    sumAmount: defaultDetailedAmount,
     team: null,
     lines: [line]
 });
 
 export default Immutable.fromJS({
     days: [day],
-    sumAmount: 0,
-    difference: 0,
-    countedAmount: 0,
-    countedAmountDetails: defaultCashbox,
+    sumAmount: defaultDetailedAmount,
+    difference: defaultDetailedAmount,
+    countedAmount: defaultDetailedAmount,
     tags: [],
     comments: null
 });

@@ -16,18 +16,17 @@
  */
 "use strict";
 
-import setValue from "../setValue";
-import navigate from "../navigate";
+import Immutable from "immutable";
+import defaultCashbox from "@validation/cashbox/default";
+import subtractCashbox from "@validation/cashbox/subtract";
 
-import deleteValue from "@validation/deleteValue";
-
-export default ({editionHref, lastRevisionHref}) => async (dispatch, getState) => {
-    if (getState().getIn(["unsavedData", editionHref])) {
-        const confirmation = confirm(`Etes-vous sûr(e) de vouloir annuler vos modifications dans ${editionHref} ?`);
-        if (!confirmation) {
-            return;
-        }
-    }
-    dispatch(setValue(["unsavedData", editionHref], deleteValue));
-    dispatch(navigate(lastRevisionHref || "/"));
+export default (item1, item2) => {
+    const amount1 = item1.get("amount");
+    const amount2 = item2.get("amount");
+    const details1 = item1.get("details") || (amount1 === 0 ? defaultCashbox : null);
+    const details2 = item2.get("details") || (amount2 === 0 ? defaultCashbox : null);
+    return Immutable.Map({
+        amount: amount1 - amount2,
+        details: details1 && details2 ? subtractCashbox(details1, details2) : null
+    });
 };

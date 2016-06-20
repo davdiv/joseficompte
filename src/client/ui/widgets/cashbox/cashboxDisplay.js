@@ -17,6 +17,7 @@
 "use strict";
 
 import React from "react";
+import cashValues from "@validation/cashbox/cashValues";
 import CashboxHeader from "./cashboxHeader";
 import formatAmount from "../../formatting/amount";
 import {formatDate} from "../../formatting/date";
@@ -27,39 +28,44 @@ const formatNumber = function(value) {
     }
 };
 
-const ItemsTable = (props) => <div>
-    <CashboxHeader title={ props.title } image={ props.image } total={ props.total } />
-    { props.total.get("number") > 0 ?
-    <table className="table table-striped table-hover">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>
-                    { props.title }
-                </th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            { props.itemsArray.map(function(item, index) {
-                const number = item.get("number");
-                if (number !== 0) {
-                    return <tr key={ index }>
-                        <td>
-                            { formatNumber(number) }
-                        </td>
-                        <td>
-                            { formatAmount(item.get("unitValue")) }
-                        </td>
-                        <td>
-                            { formatAmount(item.get("number") * item.get("unitValue")) }
-                        </td>
-                    </tr>;
-                }
-            }) }
-        </tbody>
-    </table> : null }
-</div>;
+const ItemsTable = (props) => {
+    const lines = [];
+    cashValues[props.type].forEach(function(unitValue) {
+        const number = props.itemsArray.get(`${unitValue}`) || 0;
+        if (number !== 0) {
+            lines.push(<tr key={ unitValue }>
+                <td>
+                    { formatNumber(number) }
+                </td>
+                <td>
+                    { formatAmount(unitValue) }
+                </td>
+                <td>
+                    { formatAmount(number * unitValue) }
+                </td>
+            </tr>);
+        }
+    });
+    return <div>
+        <CashboxHeader title={ props.title } image={ props.type } total={ props.total } />
+        {lines.length > 0 ?
+            <table className="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>
+                            { props.title }
+                        </th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    { lines }
+                </tbody>
+            </table>
+        : null}
+    </div>;
+};
 
 const ChecksTable = (props) => <div>
         <CashboxHeader title={ props.title } image={ props.image } total={ props.total } />
@@ -96,10 +102,10 @@ const ChecksTable = (props) => <div>
 export default ({value}) => {
     return <div className="row">
        <div className="col-md-4">
-           <ItemsTable title="Billets" image="banknotes" total={ value.getIn(["total", "banknotes"]) } itemsArray={ value.get("banknotes") } />
+           <ItemsTable title="Billets" type="banknotes" total={ value.getIn(["total", "banknotes"]) } itemsArray={ value.get("banknotes") } />
        </div>
        <div className="col-md-4">
-           <ItemsTable title="Pièces" image="coins" total={ value.getIn(["total", "coins"]) } itemsArray={ value.get("coins") } />
+           <ItemsTable title="Pièces" type="coins" total={ value.getIn(["total", "coins"]) } itemsArray={ value.get("coins") } />
        </div>
        <div className="col-md-4">
            <ChecksTable title="Chèques" image="checks" total={ value.getIn(["total", "checks"]) } itemsArray={ value.get("checks") } />

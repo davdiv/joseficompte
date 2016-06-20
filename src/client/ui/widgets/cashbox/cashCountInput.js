@@ -22,7 +22,7 @@ import ShowValidation from "../showValidation";
 import formatAmount from "../../formatting/amount";
 import formatNumber from "../../formatting/number";
 
-const numberRegExp = /^\s*([0-9]+)\s*$/;
+const numberRegExp = /^\s*(-?)\s*([0-9]+)\s*$/;
 
 const inputStyle = {
     textAlign: "right"
@@ -54,7 +54,7 @@ export default class extends TextInput {
         if (!match) {
             throw new Error("Invalid number");
         }
-        return parseInt(match[1], 10);
+        return parseInt(match[2], 10) * (match[1] ? -1 : 1);
     }
 
     onButtonMouseDown (evt) {
@@ -63,9 +63,6 @@ export default class extends TextInput {
 
     onButtonClick (inc) {
         const newValue = this.state.value + inc;
-        if (newValue < 0) {
-            return;
-        }
         this.requestChange(newValue, this.format(newValue));
     }
 

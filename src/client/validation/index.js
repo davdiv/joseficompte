@@ -17,6 +17,8 @@
 "use strict";
 
 import Immutable from "immutable";
+import deleteValue from "@validation/deleteValue";
+
 const errorMessage = "Erreur de validation. Veuillez vérifier que les champs sont correctement remplis.";
 
 export function validationFailurePrependPath(validationFailure, path) {
@@ -122,7 +124,12 @@ export function object(config) {
         let remainingProperties = arrayToKeys(value.keySeq().toJS());
         configKeys.forEach(function(key) {
             try {
-                newObject = newObject.set(key, validator(config[key])(value.get(key)));
+                const newValue = validator(config[key])(value.get(key));
+                if (newValue === deleteValue) {
+                    newObject = newObject.delete(key);
+                } else {
+                    newObject = newObject.set(key, newValue);
+                }
             } catch (e) {
                 if (!isValidationFailure(e)) {
                     throw e;
@@ -261,7 +268,7 @@ export function optional(config) {
         if (value != null) {
             return itemValidator(value);
         }
-        return value;
+        return deleteValue;
     };
 }
 

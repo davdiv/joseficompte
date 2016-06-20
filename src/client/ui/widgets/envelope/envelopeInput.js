@@ -19,13 +19,11 @@
 import React from "react";
 import DateInput from "../dateInput";
 import TextInput from "../textInput";
-import AmountInput from "../amountInput";
-import formatAmount from "../../formatting/amount";
+import DetailedAmountInput from "../detailedAmount/detailedAmountInput";
+import DetailedAmountDisplay from "../detailedAmount/detailedAmountDisplay";
 import {formatDate, formatDayOfWeek} from "../../formatting/date";
 import ShowValidation from "../showValidation";
 import ValueLink from "@validation/valueLink";
-import defaultCashbox from "@validation/cashbox/default";
-import CashboxInput from "../cashbox/cashboxInput";
 import recompute from "@validation/envelope/recompute";
 import defaultEnvelope from "@validation/envelope/default";
 
@@ -75,7 +73,7 @@ function DisplayDay (props) {
                     <TextInput className="form-control" valueLink={lineValueLink.bind(["details"])} placeholder='Détails'/>
                 </div>
                 <div className="col-md-2">
-                    <AmountInput className="form-control" valueLink={lineValueLink.bind(["amount"])}/>
+                    <DetailedAmountInput valueLink={lineValueLink.bind(["amount"])}/>
                 </div>
                 <div className="btn-group btn-group-sm col-md-1">
                     <button className="btn btn-default" onClick={spliceLines.bind(null, valueLink, [index, 0, lineValueLink.value])}><span className="glyphicon glyphicon-plus"/></button>
@@ -85,7 +83,7 @@ function DisplayDay (props) {
             <ShowValidation className='form-group form-group-sm'>
                 <label className="col-md-offset-8 col-md-1 control-label">Total</label>
                 <div className="col-md-2">
-                    <p className="form-control-static">{formatAmount(valueLink.getIn(["sumAmount"]))}</p>
+                    <p className="form-control-static"><DetailedAmountDisplay value={valueLink.getIn(["sumAmount"])}/></p>
                 </div>
             </ShowValidation>
         </div>
@@ -98,21 +96,8 @@ export default class extends React.Component {
         this.valueLink.updateIn(["days"], (days) => days.splice(...spliceArgs));
     }
 
-    removeCashbox() {
-        const countedAmountDetails = this.valueLink.getIn(["countedAmountDetails"]);
-        if (countedAmountDetails) {
-            this.savedCountedAmountDetails = countedAmountDetails;
-            this.valueLink.setIn(["countedAmountDetails"], null);
-        }
-    }
-
-    addCashbox() {
-        this.valueLink.setIn(["countedAmountDetails"], this.savedCountedAmountDetails || defaultCashbox);
-    }
-
     render() {
         const valueLink = this.valueLink = ValueLink.wrapValidator(this.props.valueLink, recompute, defaultEnvelope);
-        const countedAmountDetails = valueLink.getIn(["countedAmountDetails"]);
         return <div className="form-horizontal">
             {valueLink.mapBind(["days"], (valueLink, index, array) => <DisplayDay valueLink={valueLink} key={index} onAddClick={this.spliceDays.bind(this,[index, 0, valueLink.value])} onCloseClick={array.size >= 2 ? this.spliceDays.bind(this,[index, 1]) : null} />)}
 
@@ -121,35 +106,21 @@ export default class extends React.Component {
                 <div className="panel-body">
                     <ShowValidation className="form-group form-group-sm">
                         <label className="col-md-9 control-label">Montant réel</label>
-                        { countedAmountDetails ?
-                            <div className="col-md-2">
-                                <p className="form-control-static">{formatAmount(valueLink.getIn(["countedAmount"]))}</p>
-                            </div>
-                        : null }
-                        { !countedAmountDetails ?
-                            <div className="col-md-2">
-                                <div className="input-group input-group-sm">
-                                    <AmountInput className="form-control" valueLink={valueLink.bind(["countedAmount"])}/>
-                                    <span className="input-group-btn">
-                                        <button className="btn btn-default" onClick={this.addCashbox.bind(this)} title="Détailler le montant réel">
-                                            <span className="glyphicon glyphicon-list-alt"/>
-                                        </button>
-                                    </span>
-                                </div>
-                            </div>
-                        : null }
+                        <div className="col-md-2">
+                            <DetailedAmountInput valueLink={valueLink.bind(["countedAmount"])}/>
+                        </div>
                     </ShowValidation>
                     <ShowValidation className="form-group form-group-sm">
                         <label className="col-md-9 control-label">Somme</label>
                         <div className="col-md-2">
-                            <p className="form-control-static">{formatAmount(valueLink.getIn(["sumAmount"]))}</p>
+                            <p className="form-control-static"><DetailedAmountDisplay value={valueLink.getIn(["sumAmount"])}/></p>
                         </div>
                     </ShowValidation>
                     <ShowValidation className="form-group form-group-sm">
                         <label className="col-md-9 control-label">Différence</label>
                         <div className="col-md-2">
                             <p className="form-control-static">
-                                <span>{formatAmount(valueLink.getIn(["difference"]))}&nbsp;&nbsp;{valueLink.getIn(["difference"]) === 0 ? <span className="glyphicon glyphicon-ok-sign"/> : null }</span>
+                                <span><DetailedAmountDisplay value={valueLink.getIn(["difference"])}/>&nbsp;&nbsp;{valueLink.getIn(["difference", "amount"]) === 0 ? <span className="glyphicon glyphicon-ok-sign"/> : null }</span>
                             </p>
                         </div>
                     </ShowValidation>
@@ -167,20 +138,6 @@ export default class extends React.Component {
                     </ShowValidation>
                 </div>
             </div>
-
-            { countedAmountDetails ?
-                <div className="panel panel-default">
-                    <div className="panel-heading"><h4 className="panel-title">Détails du montant réel: {formatAmount(valueLink.getIn(["countedAmountDetails","total","total","total"]))}
-                        <button className="btn btn-default btn-xs pull-right" onClick={this.removeCashbox.bind(this)}>
-                            <span className="glyphicon glyphicon-remove"/>
-                        </button></h4>
-                    </div>
-                    <div className="panel-body">
-                        <CashboxInput valueLink={valueLink.bind(["countedAmountDetails"])}/>
-                    </div>
-                </div>
-            : null }
-
         </div>;
     }
 }

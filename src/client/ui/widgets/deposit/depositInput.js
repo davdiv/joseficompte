@@ -20,71 +20,30 @@ import React from "react";
 import Immutable from "immutable";
 import DateInput from "../dateInput";
 import TextInput from "../textInput";
-import AmountInput from "../amountInput";
-import formatAmount from "../../formatting/amount";
 import {formatDayOfWeek} from "../../formatting/date";
 import ShowValidation from "../showValidation";
 import ValueLink from "@validation/valueLink";
-import defaultCashbox from "@validation/cashbox/default";
-import CashboxInput from "../cashbox/cashboxInput";
+import DetailedAmountDisplay from "../detailedAmount/detailedAmountDisplay";
+import DetailedAmountInput from "../detailedAmount/detailedAmountInput";
 import recompute from "@validation/deposit/recompute";
 import defaultDeposit from "@validation/deposit/default";
+import defaultDetailedAmount from "@validation/detailedAmount/default";
 
 const defaultRefusal = Immutable.Map({
-    amount: 0,
-    amountDetails: defaultCashbox,
+    amount: defaultDetailedAmount,
     reason: null
 });
 
-const AmountLine = ({title, valueLink, addDetails}) => {
+const AmountLine = ({title, valueLink}) => {
     return <ShowValidation className="form-group form-group-sm">
         <label className="col-md-2 control-label">{title}</label>
-        { valueLink.getIn(["amountDetails"]) ?
-            <div className="col-md-3">
-                <p className="form-control-static">{formatAmount(valueLink.getIn(["amount"]))}</p>
-            </div>
-        :   <div className="col-md-3">
-                <div className="input-group input-group-sm">
-                    <AmountInput className="form-control" valueLink={valueLink.bind(["amount"])}/>
-                    <span className="input-group-btn">
-                        <button className="btn btn-default" onClick={addDetails} title="Détailler le montant">
-                            <span className="glyphicon glyphicon-list-alt"/>
-                        </button>
-                    </span>
-                </div>
-            </div>
-        }
+        <div className="col-md-3">
+            <DetailedAmountInput valueLink={valueLink}/>
+        </div>
     </ShowValidation>;
 };
 
-const AmountDetails = ({title, valueLink, remove}) => valueLink.value ?
-    <div className="panel panel-default">
-        <div className="panel-heading">
-            <h4 className="panel-title">{title} {formatAmount(valueLink.getIn(["total","total","total"]))}
-                <button className="btn btn-default btn-xs pull-right" onClick={remove}>
-                    <span className="glyphicon glyphicon-remove"/>
-                </button>
-            </h4>
-        </div>
-        <div className="panel-body">
-            <CashboxInput valueLink={valueLink}/>
-        </div>
-    </div> : null;
-
 export default class extends React.Component {
-
-    removeCashbox(whichOne) {
-        const path = [whichOne, "amountDetails"];
-        const cashbox = this.valueLink.getIn(path);
-        if (cashbox) {
-            this[`${whichOne}savedCashbox`] = cashbox;
-            this.valueLink.setIn(path, null);
-        }
-    }
-
-    addCashbox(whichOne) {
-        this.valueLink.setIn([whichOne, "amountDetails"], this[`${whichOne}savedCashbox`] || defaultCashbox);
-    }
 
     toggleRefusal() {
         const refusal = this.valueLink.getIn(["refusal"]);
@@ -130,13 +89,13 @@ export default class extends React.Component {
                             </div>
                         </div>
                     </ShowValidation>
-                    <AmountLine title={depositLabel} valueLink={valueLink.bind(["deposit"])} addDetails={()=>this.addCashbox("deposit")}/>
-                    { refusal ? <AmountLine title="Montant refusé" valueLink={valueLink.bind(["refusal"])} addDetails={()=>this.addCashbox("refusal")}/> : null }
+                    <AmountLine title={depositLabel} valueLink={valueLink.bind(["deposit"])}/>
+                    { refusal ? <AmountLine title="Montant refusé" valueLink={valueLink.bind(["refusal", "amount"])}/> : null }
                     { refusal ?
                         <ShowValidation className="form-group form-group-sm">
                             <label className="col-md-2 control-label">Total</label>
                             <div className="col-md-3">
-                                <p className="form-control-static">{formatAmount(valueLink.getIn(["total"]))}</p>
+                                <p className="form-control-static"><DetailedAmountDisplay value={valueLink.getIn(["total"])}/></p>
                             </div>
                         </ShowValidation>
                     : null }
@@ -162,9 +121,6 @@ export default class extends React.Component {
                     </ShowValidation>
                 </div>
             </div>
-
-            <AmountDetails title={depositLabel} valueLink={valueLink.bind(["deposit", "amountDetails"])} remove={()=>this.removeCashbox("deposit")}/>
-            <AmountDetails title="Montant refusé" valueLink={valueLink.bind(["refusal", "amountDetails"])} remove={()=>this.removeCashbox("refusal")}/>
         </div>;
     }
 }

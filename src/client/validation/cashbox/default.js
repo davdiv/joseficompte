@@ -18,28 +18,14 @@
 
 import Immutable from "immutable";
 
-// To avoid floating point operation issues, all amounts are in centimes
-const COINS = Immutable.List.of(200, 100, 50, 20, 10, 5, 2, 1);
-const BANKNOTES = Immutable.List.of(50000, 20000, 10000, 5000, 2000, 1000, 500);
-
-const initUnitValue = Immutable.Map({
-    unitValue: 1,
-    number: 0,
-    total: 0
-});
-
 const initTotalValue = Immutable.Map({
     total: 0,
     number: 0
 });
 
-const initObject = function(unitValue) {
-    return initUnitValue.set("unitValue", unitValue);
-};
-
 export default Immutable.Map({
-    coins: COINS.map(initObject),
-    banknotes: BANKNOTES.map(initObject),
+    coins: Immutable.Map(),
+    banknotes: Immutable.Map(),
     checks: Immutable.List(),
     total: Immutable.Map({
         coins: initTotalValue,

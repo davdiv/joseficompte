@@ -31,9 +31,9 @@
 }
 
 .cashbox-checks {
-    background-image: url(./images/coins.png);
+    background-image: url(./images/checks.png);
 }
 
 .cashbox-coins {
-    background-image: url(./images/checks.png);
+    background-image: url(./images/coins.png);
 }

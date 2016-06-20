@@ -17,14 +17,11 @@
 "use strict";
 
 import Immutable from "immutable";
-import defaultCashbox from "@validation/cashbox/default";
+import defaultDetailedAmount from "@validation/detailedAmount/default";
 
 export default Immutable.fromJS({
     date: null,
-    deposit: {
-        amount: 0,
-        amountDetails: defaultCashbox
-    },
+    deposit: defaultDetailedAmount,
     refusal: null,
     tags: [],
     comments: null

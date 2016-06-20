@@ -16,20 +16,16 @@
  */
 "use strict";
 
+import comparingSetIn from "@validation/comparingSetIn";
+import subtractAmount from "@validation/detailedAmount/subtract";
+
 export default function(model) {
-    const depositCashbox = model.getIn(["deposit", "amountDetails"]);
-    if (depositCashbox) {
-        model = model.setIn(["deposit", "amount"], depositCashbox.getIn(["total", "total", "total"]));
-    }
-    let total = model.getIn(["deposit", "amount"]);
+    let total = model.getIn(["deposit"]);
     const refusal = model.get("refusal");
     if (refusal) {
-        const refusalCashbox = refusal.get("amountDetails");
-        if (refusalCashbox) {
-            model = model.setIn(["refusal", "amount"], refusalCashbox.getIn(["total", "total", "total"]));
-        }
-        total -= model.getIn(["refusal", "amount"]);
+        const refusalAmount = refusal.get("amount");
+        total = subtractAmount(total, refusalAmount);
     }
-    model = model.set("total", total);
+    model = comparingSetIn(model, ["total"], total);
     return model;
 }

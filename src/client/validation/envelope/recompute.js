@@ -16,23 +16,24 @@
  */
 "use strict";
 
+import comparingSetIn from "@validation/comparingSetIn";
+import addAmounts from "@validation/detailedAmount/add";
+import subtractAmount from "@validation/detailedAmount/subtract";
+
 export default function(model) {
-    let totalSum = 0;
+    const totalSum = [];
     model.get("days").forEach((day, dayIndex) => {
-        let daySum = 0;
+        const daySum = [];
         day.get("lines").forEach(line => {
             const amount = line.get("amount");
-            daySum += amount;
+            daySum.push(amount);
         });
-        model = model.setIn(["days", dayIndex, "sumAmount"], daySum);
-        totalSum += daySum;
+        const daySumResult = addAmounts(...daySum);
+        model = comparingSetIn(model, ["days", dayIndex, "sumAmount"], daySumResult);
+        totalSum.push(daySumResult);
     });
-    model = model.set("sumAmount", totalSum);
-    const cashbox = model.get("countedAmountDetails");
-    if (cashbox) {
-        model = model.set("countedAmount", cashbox.getIn(["total", "total", "total"]));
-    }
-    const countedAmount = model.get("countedAmount");
-    model = model.set("difference", countedAmount - totalSum);
+    const totalSumResult = addAmounts(...totalSum);
+    model = comparingSetIn(model, ["sumAmount"], totalSumResult);
+    model = comparingSetIn(model, ["difference"], subtractAmount(model.get("countedAmount"), totalSumResult));
     return model;
 }

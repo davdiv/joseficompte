@@ -16,23 +16,19 @@
  */
 "use strict";
 
-import {validator, object, string, array, date, integer, id, optional} from "@validation";
-import cashbox from "@validation/cashbox";
+import {validator, object, string, array, date, id, optional} from "@validation";
+import detailedAmount from "@validation/detailedAmount";
 import recompute from "./recompute";
 
 export default validator([object({
     date: date,
     reference: optional(string),
-    deposit: object({
-        amount: integer,
-        amountDetails: optional(cashbox)
-    }),
+    deposit: detailedAmount,
     refusal: optional(object({
-        amount: integer,
-        amountDetails: optional(cashbox),
+        amount: detailedAmount,
         reason: string
     })),
-    total: integer,
+    total: detailedAmount,
     tags: array(id),
     comments: optional(string)
 }), recompute]);

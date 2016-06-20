@@ -16,7 +16,7 @@
  */
 "use strict";
 
-import deleteValue from "./deleteValue";
+import deleteValue from "@validation/deleteValue";
 
 export default function(state, action) {
     if (action.type === "SET_VALUES") {

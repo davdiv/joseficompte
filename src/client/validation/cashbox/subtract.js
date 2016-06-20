@@ -16,18 +16,15 @@
  */
 "use strict";
 
-import setValue from "../setValue";
-import navigate from "../navigate";
+import recompute from "./recompute";
 
-import deleteValue from "@validation/deleteValue";
-
-export default ({editionHref, lastRevisionHref}) => async (dispatch, getState) => {
-    if (getState().getIn(["unsavedData", editionHref])) {
-        const confirmation = confirm(`Etes-vous sûr(e) de vouloir annuler vos modifications dans ${editionHref} ?`);
-        if (!confirmation) {
-            return;
-        }
-    }
-    dispatch(setValue(["unsavedData", editionHref], deleteValue));
-    dispatch(navigate(lastRevisionHref || "/"));
+export default (cashbox1, cashbox2) => {
+    let result = cashbox1;
+    const processCoinsOrBanknotes = (property) => (number, unitValue) => {
+        result = result.setIn([property, unitValue], result.getIn([property, unitValue], 0) - number);
+    };
+    cashbox2.get("coins").forEach(processCoinsOrBanknotes("coins"));
+    cashbox2.get("banknotes").forEach(processCoinsOrBanknotes("banknotes"));
+    result = result.set("checks", result.get("checks").concat(cashbox2.get("checks").map(value => value.set("total", -value.get("total")))));
+    return recompute(result);
 };

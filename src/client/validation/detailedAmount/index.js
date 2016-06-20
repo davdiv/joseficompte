@@ -16,18 +16,11 @@
  */
 "use strict";
 
-import setValue from "../setValue";
-import navigate from "../navigate";
+import {object, integer, validator, optional} from "@validation";
+import cashbox from "@validation/cashbox";
+import recompute from "./recompute";
 
-import deleteValue from "@validation/deleteValue";
-
-export default ({editionHref, lastRevisionHref}) => async (dispatch, getState) => {
-    if (getState().getIn(["unsavedData", editionHref])) {
-        const confirmation = confirm(`Etes-vous sûr(e) de vouloir annuler vos modifications dans ${editionHref} ?`);
-        if (!confirmation) {
-            return;
-        }
-    }
-    dispatch(setValue(["unsavedData", editionHref], deleteValue));
-    dispatch(navigate(lastRevisionHref || "/"));
-};
+export default validator([object({
+    amount: integer,
+    details: optional(cashbox)
+}), recompute]);

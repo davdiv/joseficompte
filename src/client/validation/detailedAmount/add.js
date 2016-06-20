@@ -16,18 +16,26 @@
  */
 "use strict";
 
-import setValue from "../setValue";
-import navigate from "../navigate";
+import Immutable from "immutable";
+import addCashbox from "@validation/cashbox/add";
 
-import deleteValue from "@validation/deleteValue";
-
-export default ({editionHref, lastRevisionHref}) => async (dispatch, getState) => {
-    if (getState().getIn(["unsavedData", editionHref])) {
-        const confirmation = confirm(`Etes-vous sûr(e) de vouloir annuler vos modifications dans ${editionHref} ?`);
-        if (!confirmation) {
-            return;
+export default (...items) => {
+    let sumDetails = [];
+    let sum = 0;
+    for (const item of items) {
+        const details = item.get("details");
+        const amount = item.get("amount");
+        if (!details) {
+            if (amount !== 0) {
+                sumDetails = null;
+            }
+        } else if (sumDetails) {
+            sumDetails.push(details);
         }
+        sum += amount;
     }
-    dispatch(setValue(["unsavedData", editionHref], deleteValue));
-    dispatch(navigate(lastRevisionHref || "/"));
+    return Immutable.Map({
+        amount: sum,
+        details: sumDetails ? addCashbox(...sumDetails) : null
+    });
 };
