@@ -66,6 +66,12 @@ export default class extends TextInput {
         this.requestChange(newValue, this.format(newValue));
     }
 
+    computeInputProps() {
+        const res = super.computeInputProps();
+        delete res.unitValue;
+        return res;
+    }
+
     render () {
         const inputProps = this.computeInputProps();
         inputProps.type = "text";
